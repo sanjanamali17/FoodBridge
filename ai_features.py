@@ -3,6 +3,15 @@ import json
 from typing import List, Dict, Tuple
 import streamlit as st  import openai                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        import openai
 from db import get_ngos_by_capacity, save_chat_message, get_chat_history
+from tensorflow.keras.models import load_model
+
+# Load the model once at the start
+try:
+    model = load_model("./model.h5")
+    print("Model loaded successfully")
+except Exception as e:
+    print(f"Error loading model: {e}")
+    model = None
 
 def initialize_openai():
     """Initialize OpenAI client."""
@@ -135,6 +144,12 @@ def generate_donation_summary(donation_data: Dict) -> str:
     except Exception as e:
         print(f"Error generating donation summary: {e}")
         return f"Fresh donation of {donation_data.get('quantity')} {donation_data.get('unit')} {donation_data.get('food_name')} available for pickup."
+def predict_food_quality(image_array):
+    if model is None:
+        return "Unknown"
+    prediction = model.predict(image_array)  # Model returns numbers
+    label = "Fresh" if prediction[0][0] > 0.5 else "Spoiled"
+    return label
 
 def suggest_best_ngo(donation_data: Dict, available_ngos: List[Dict] = []) -> Dict:
     """

@@ -3,6 +3,10 @@ import sqlite3
 from auth import initialize_auth, login_user, register_user, logout_user
 from db import init_database
 import os
+from ai_features import predict_food_quality
+
+image_input = ... # get from Streamlit file uploader
+quality = predict_food_quality(image_input)
 
 # Initialize database
 init_database()
